@@ -90,7 +90,7 @@ def get_haerin_bench(version=2):
             labels.append('Yes')
             texts.append('Is she haerin?')
     for img_path in os.listdir(version+'/non_haerin/'):
-        if '.jpg' in img_path:
+        if '.jpg' in img_path or '.jpeg' in img_path:
             img_path = version+'/non_haerin/'+img_path
             img = resize_image_keep_aspect(img_path,256)
             images.append(img)
