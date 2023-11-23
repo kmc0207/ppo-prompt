@@ -203,6 +203,9 @@ def main():
     
     #메인 학습 부분
     wandb.login()
+    
+    global_max = -100
+    global_max_prompt =''
     run = wandb.init(project='ppo-prompt',name= args.run_name,config=args)
     for ep in tqdm(range(args.max_epochs)):
             text = args.start_prompt
@@ -213,9 +216,13 @@ def main():
             reward_np = [reward.item() for reward in rewards]
             print(reward_np)
             print(output[np.argmax(np.array(reward_np))])
+            max_reward = np.max(np.array(reward_np))
+            if max_reward > global_max:
+                global_max = max_reward
+                global_max_prompt = output[np.argmax(np.array(reward_np))]
             wandb.log({'max_reward':np.max(np.array(reward_np)), 'max_reward_output':output[np.argmax(np.array(reward_np))],'mean_reward':np.mean(np.array(reward_np))})
             stats = ppo_trainer.step([query_tensors for i in range(5)],[response for response in response_tensors],rewards)
-    
+    open('prompt.txt','w').write(global_max_prompt)
     
     
 if __name__ == '__main__':
