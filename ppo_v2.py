@@ -59,6 +59,12 @@ def parse_args():
         type=str,
         default= 'ppo-prompt'
     )
+    
+    parser.add_argument(
+        '--train_on_gpu',
+        type=bool,
+        default= True
+    )
     args = parser.parse_args()
     return args
 
@@ -147,6 +153,10 @@ def main():
         learning_rate = args.learning_rate,
         batch_size = args.batch_size
     )
+    if args.train_on_gpu:
+        device_map = 'cuda:0'
+    else:
+        device_map = 'auto'
     if args.using_lora:
         lora_config = LoraConfig(
             r=16,
@@ -156,11 +166,11 @@ def main():
             task_type="CAUSAL_LM",
         )
         
-        train_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,device_map ='cuda:0',torch_dtype=torch.bfloat16,peft_config=lora_config)
-        ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,device_map='cuda:0',torch_dtype=torch.bfloat16,peft_config=lora_config)
+        train_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,device_map =device_map,torch_dtype=torch.bfloat16,peft_config=lora_config)
+        ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,device_map=device_map,torch_dtype=torch.bfloat16,peft_config=lora_config)
     else:
-        train_model = AutoModelForCausalLM.from_pretrained(config.model_name,device_map ='cuda:0',torch_dtype=torch.bfloat16)
-        ref_model = AutoModelForCausalLM.from_pretrained(config.model_name,device_map='cuda:0',torch_dtype=torch.bfloat16)
+        train_model = AutoModelForCausalLM.from_pretrained(config.model_name,device_map =device_map,torch_dtype=torch.bfloat16)
+        ref_model = AutoModelForCausalLM.from_pretrained(config.model_name,device_map=device_map,torch_dtype=torch.bfloat16)
     train_tokenizer = AutoTokenizer.from_pretrained(config.model_name)
     train_tokenizer.pad_token = train_tokenizer.eos_token
     
