@@ -222,7 +222,8 @@ def main():
                 global_max_prompt = output[np.argmax(np.array(reward_np))]
             wandb.log({'max_reward':np.max(np.array(reward_np)), 'max_reward_output':output[np.argmax(np.array(reward_np))],'mean_reward':np.mean(np.array(reward_np))})
             stats = ppo_trainer.step([query_tensors for i in range(5)],[response for response in response_tensors],rewards)
-    open('prompt.txt','w').write(global_max_prompt)
+    open('prompt.txt', 'w').write(f'global_max_prompt: {global_max_prompt}\nglobal_max: {global_max}')
+    print('global_max:', global_max, 'global_max_prompt:', global_max_prompt)
     
     
 if __name__ == '__main__':
